@@ -32,6 +32,13 @@ use Lcobucci\JWT\Signer\Ecdsa\Sha384 as ES384;
 use Lcobucci\JWT\Signer\Ecdsa\Sha512 as ES512;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
+
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\ServiceAccount;
+use Firebase\Auth\Token\Exception\InvalidToken;
+
+
+
 class Lcobucci extends Provider implements JWT
 {
     /**
@@ -132,9 +139,15 @@ class Lcobucci extends Provider implements JWT
         } catch (Exception $e) {
             throw new TokenInvalidException('Could not decode token: '.$e->getMessage(), $e->getCode(), $e);
         }
+        $serviceAccount = ServiceAccount::fromJsonFile('/var/www/fan-retreat-firebase-adminsdk-ltxfv-372cb60012.json');
+        $firebase = (new Factory)
+            ->withServiceAccount($serviceAccount)
+            ->create();
 
-        if (! $jwt->verify($this->signer, $this->getVerificationKey())) {
-            throw new TokenInvalidException('Token Signature could not be verified.');
+        try {
+            $verifiedIdToken = $firebase->getAuth()->verifyIdToken($token);
+        } catch (Exception $e) {
+            echo $e->getMessage();
         }
 
         return (new Collection($jwt->getClaims()))->map(function ($claim) {

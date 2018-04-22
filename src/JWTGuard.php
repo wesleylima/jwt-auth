@@ -76,7 +76,9 @@ class JWTGuard implements Guard
             ($payload = $this->jwt->check(true)) &&
             $this->validateSubject()
         ) {
-            return $this->user = $this->provider->retrieveById($payload['sub']);
+            # Overdie retrieve by Id method to work with our custom field storing
+            $u = $this->provider->retrieveByCredentials(["email" => $payload['email']]);
+            return $this->user = $u;
         }
     }
 
