@@ -89,7 +89,6 @@ class JWTGuard implements Guard
               throw new UserNotDefinedException('This email is not verified.');
             }
         }
-        throw new UserNotDefinedException('Token is not valid.');
     }
 
     /**
