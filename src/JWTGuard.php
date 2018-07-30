@@ -76,10 +76,20 @@ class JWTGuard implements Guard
             ($payload = $this->jwt->check(true)) &&
             $this->validateSubject()
         ) {
-            # Overdie retrieve by Id method to work with our custom field storing
-            $u = $this->provider->retrieveByCredentials(["email" => $payload['email']]);
-            return $this->user = $u;
+            # Overide retrieve by Id method to work with our custom field storing
+            if ($payload['email_verified']) {
+              $u = $this->provider->retrieveByCredentials(["email" => $payload['email']]);
+              // return $this->user = $u;
+              if ($u) {
+                return $this->user = $u;
+              } else {
+                throw new UserNotDefinedException('This user does not exist in this service.');
+              }
+            } else {
+              throw new UserNotDefinedException('This email is not verified.');
+            }
         }
+        throw new UserNotDefinedException('Token is not valid.');
     }
 
     /**

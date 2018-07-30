@@ -139,7 +139,7 @@ class Lcobucci extends Provider implements JWT
         } catch (Exception $e) {
             throw new TokenInvalidException('Could not decode token: '.$e->getMessage(), $e->getCode(), $e);
         }
-        $serviceAccount = ServiceAccount::fromJsonFile('/var/www/fan-retreat-firebase-adminsdk-ltxfv-372cb60012.json');
+        $serviceAccount = ServiceAccount::fromArray(config('firebase.service_credentials'));
         $firebase = (new Factory)
             ->withServiceAccount($serviceAccount)
             ->create();
